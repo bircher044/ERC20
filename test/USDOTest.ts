@@ -19,10 +19,11 @@ describe("Tests", async () => {
     let ethPrice : BigNumber
     let transactionValue : BigNumber;
     let tokenAmount : BigNumber;
+    let oracleDecimals : BigNumber;
 
     describe("USDO contract", async () => {
 
-        beforeEach(async () => {
+        beforeEach(async () => {    
 
             [owner, anotherUser, thirdUser] = await ethers.getSigners();
 
@@ -36,11 +37,12 @@ describe("Tests", async () => {
 
             totalSupply = BigNumber.from("1000000000000000000000000000");
             decimals = BigNumber.from(18);
+            oracleDecimals = BigNumber.from(await aggregator.decimals());
             name = "USDO";
             symbol = "USD";
-
             transactionValue = BigNumber.from("200000000000000000");
-            tokenAmount = transactionValue.mul(ethPrice).div(BigNumber.from("1000000000000000000"));
+
+            tokenAmount = transactionValue.mul(ethPrice).div(BigNumber.from(10).pow(decimals.sub(oracleDecimals)));
         });
     
 

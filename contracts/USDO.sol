@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "hardhat/console.sol";
 
 contract USDO is ERC20, Ownable {
     
@@ -46,7 +45,9 @@ contract USDO is ERC20, Ownable {
 
         (, int256 answer,,,) = oracle.latestRoundData();
 
-        uint256 tokenAmount = (msg.value * uint256(answer)) / (10 ** decimals());
+        uint8 oracleDecimals = oracle.decimals();
+
+        uint256 tokenAmount = (msg.value * uint256(answer)) / (10 ** (decimals() - oracleDecimals));
         
         require(balanceOf(address(this)) >= tokenAmount, "USDO: not enought tokens left");
 

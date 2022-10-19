@@ -422,7 +422,7 @@ contract AggregatorProxy is AggregatorV2V3Interface, Owned {
     override
     returns (uint8)
   {
-    return currentPhase.aggregator.decimals();
+    return 8;
   }
 
   /**
