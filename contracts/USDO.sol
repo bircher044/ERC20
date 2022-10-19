@@ -16,7 +16,7 @@ contract USDO is ERC20, Ownable {
     event withdrawed(address currectOwner, uint256 amount);
 
     constructor() ERC20("USDO", "USD"){
-        _mint(address(this), 10 ** 9);
+        _mint(address(this), 10 ** 27);
         transferOwnership(msg.sender);
     }
     
