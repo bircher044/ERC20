@@ -44,10 +44,8 @@ contract USDO is ERC20, Ownable {
         AggregatorV3Interface oracle = AggregatorV3Interface(ethAggregator);
 
         (, int256 answer,,,) = oracle.latestRoundData();
-
         uint8 oracleDecimals = oracle.decimals();
-
-        uint256 tokenAmount = (msg.value * uint256(answer)) / (10 ** (decimals() - oracleDecimals));
+        uint256 tokenAmount = (msg.value * uint256(answer)) / (10 ** (oracleDecimals));
         
         require(balanceOf(address(this)) >= tokenAmount, "USDO: not enought tokens left");
 

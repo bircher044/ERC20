@@ -42,7 +42,7 @@ describe("Tests", async () => {
             symbol = "USD";
             transactionValue = BigNumber.from("200000000000000000");
 
-            tokenAmount = transactionValue.mul(ethPrice).div(BigNumber.from(10).pow(decimals.sub(oracleDecimals)));
+            tokenAmount = transactionValue.mul(ethPrice).div(BigNumber.from(10).pow(oracleDecimals));
         });
     
 
