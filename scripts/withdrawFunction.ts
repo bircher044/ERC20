@@ -2,7 +2,7 @@ import {ethers} from "hardhat";
 import {USDO__factory} from "../typechain-types";
 import * as dotenv from 'dotenv';
 
-const USDOContractAddress = "0xf8F5D03a9FDBC9b0910FFDBdbB77234d2B2601E1";
+const USDOContractAddress = "0x2c4905771771349DdBb416c03f83de65eF510553";
 
 const aggregatorAddress = "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e";
 
