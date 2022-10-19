@@ -34,7 +34,7 @@ describe("Tests", async () => {
 
             ethPrice = (await aggregator.latestRoundData())[1];
 
-            totalSupply = BigNumber.from(10 ** 9);
+            totalSupply = BigNumber.from("1000000000000000000000000000");
             decimals = BigNumber.from(18);
             name = "USDO";
             symbol = "USD";
@@ -46,7 +46,7 @@ describe("Tests", async () => {
 
         describe("Deployment", async () => {
         
-            it('Should mint 10^9 tokens on contract balance', async () => {
+            it('Should mint correct total supply', async () => {
 
                 expect(await USDO.balanceOf(USDO.address)).to.equal(totalSupply);
 
