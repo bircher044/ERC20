@@ -11,15 +11,22 @@ contract USDO is ERC20, Ownable {
     address ethAggregator = address(0);
 
     event aggregatorChanged(address newEthAggregator);
-    event tokenSold(address buyer, uint256 amount);
-    event withdrawed(address currectOwner, uint256 amount);
+    event stablecoinStatusChanged(address stablecoin, bool newStatus);
 
-    constructor() ERC20("USDO", "USD"){
-        _mint(address(this), 10 ** 27);
+    event withdrawed(address currectOwner, uint256 amount);
+    event tokenWithdrawed(address stablecoin, uint256 amount);
+    
+    event tokenSold(address buyer, uint256 amount);
+    event tokenSwaped(address buyer, address stablecoin, uint256 USDOAmount);
+
+    mapping(address => bool) acceptableStablecoins;
+
+    constructor() ERC20("USDO", "USD", 18){
+        _mint(address(this), 10 ** 37);
         transferOwnership(msg.sender);
     }
     
-    function setAggregator(address _newEthAggregator) public onlyOwner {
+    function setAggregator(address _newEthAggregator) external onlyOwner {
         ethAggregator = _newEthAggregator;
 
         emit aggregatorChanged(ethAggregator);
@@ -29,7 +36,47 @@ contract USDO is ERC20, Ownable {
         return ethAggregator;
     }
     
-    function withdraw() public onlyOwner{
+    function setAcceptableStablecoin(address _acceptableStablecoin, bool _newStatus) external onlyOwner {
+        require(acceptableStablecoins[_acceptableStablecoin] != _newStatus, "USDO: Current status is equal to yours");
+
+        acceptableStablecoins[_acceptableStablecoin] = _newStatus;
+        emit stablecoinStatusChanged(_acceptableStablecoin, _newStatus);
+    }
+
+    function getstablecoinStatus(address _stablecoin) public view returns (bool){
+        return acceptableStablecoins[_stablecoin];
+    }
+
+    function buy() external payable{
+        require(ethAggregator != address(0), "USDO: contract is on pause");
+
+        AggregatorV3Interface oracle = AggregatorV3Interface(ethAggregator);
+
+        (, int256 answer,,,) = oracle.latestRoundData();
+        uint8 oracleDecimals = oracle.decimals();
+        uint256 USDOAmount = (msg.value * uint256(answer)) / (10 ** (oracleDecimals));
+
+        _transfer(address(this), msg.sender, USDOAmount);
+
+        emit tokenSold(msg.sender, USDOAmount);
+    }
+
+    function swap(address _stablecoin, uint256 _amount) external payable{
+        require(ethAggregator != address(0), "USDO: contract is on pause");
+        require(acceptableStablecoins[_stablecoin], "USDO: not acceptable coin");
+
+        ERC20 token = ERC20(_stablecoin);
+
+        uint256 USDOAmount = _amount * (10 ** (decimals() - token.decimals()));
+        bool success = token.transferFrom(msg.sender, address(this), _amount);
+        require(success, "USDO: token receive was failed");
+
+        _transfer(address(this), msg.sender, USDOAmount);
+
+        emit tokenSwaped(msg.sender, _stablecoin, USDOAmount);
+    }
+    
+    function withdraw() external onlyOwner{
         require(address(this).balance > 0, "USDO: zero balance");
 
         uint256 amount = address(this).balance;
@@ -38,20 +85,15 @@ contract USDO is ERC20, Ownable {
         emit withdrawed(msg.sender, amount);
     }
 
-    receive() external payable{
-        require(ethAggregator != address(0), "USDO: contract is on pause");
+    function withdrawToken(address _stablecoin) external onlyOwner{
+        ERC20 token = ERC20(_stablecoin);
+        uint256 contractStablecoinBalance = token.balanceOf(address(this));
 
-        AggregatorV3Interface oracle = AggregatorV3Interface(ethAggregator);
+        require(contractStablecoinBalance > 0, "USDO: zero stablecoin balance");
 
-        (, int256 answer,,,) = oracle.latestRoundData();
-        uint8 oracleDecimals = oracle.decimals();
-        uint256 tokenAmount = (msg.value * uint256(answer)) / (10 ** (oracleDecimals));
-        
-        require(balanceOf(address(this)) >= tokenAmount, "USDO: not enought tokens left");
+        token.transfer(msg.sender, contractStablecoinBalance);
 
-        _transfer(address(this), msg.sender, tokenAmount);
-
-        emit tokenSold(msg.sender, tokenAmount);
+        emit tokenWithdrawed(msg.sender, contractStablecoinBalance);
     }
-    
+
 }
