@@ -52,6 +52,8 @@ describe("Tests", async () => {
         });
     
 
+
+        
         describe("Deployment", async () => {
         
             it('Should mint correct total supply', async () => {
@@ -78,6 +80,9 @@ describe("Tests", async () => {
             });
         
         });
+
+
+
 
         describe("Testing aggregator functions", async () => {
 
@@ -112,6 +117,9 @@ describe("Tests", async () => {
             });
 
         });
+
+
+
 
         describe("Testing setting acceptable stablecoins", async () => {
             
@@ -322,7 +330,7 @@ describe("Tests", async () => {
 
 
 
-        describe("Testing eth withdraw function", async () => {
+        describe("Testing token withdraw function", async () => {
 
             it("Should revert when contract balance is equal to zero", async () => {
 

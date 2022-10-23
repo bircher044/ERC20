@@ -21,7 +21,7 @@ contract USDO is ERC20, Ownable {
 
     mapping(address => bool) acceptableStablecoins;
 
-    constructor() ERC20("USDO", "USD", 18){
+    constructor() ERC20("USDO", "USD"){
         _mint(address(this), 10 ** 37);
         transferOwnership(msg.sender);
     }
